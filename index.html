@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Refactoring Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .task-list {
+            margin-top: 15px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .task-text {
+            flex: 1;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .add-task-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .add-task-form input {
+            flex: 1;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: #ffe8e8;
+            color: #dc3545;
+        }
+
+        .priority-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .priority-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .export-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Code Refactoring Planner</h1>
+            <p class="subtitle">Organize and track your code refactoring efforts</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Project Info Section -->
+            <div class="section">
+                <h2>📋 Project Information</h2>
+                <div class="input-group">
+                    <label for="projectName">Project Name</label>
+                    <input type="text" id="projectName" placeholder="e.g., E-commerce Platform Refactor">
+                </div>
+                <div class="input-group">
+                    <label for="projectGoal">Refactoring Goal</label>
+                    <textarea id="projectGoal" placeholder="Describe the main goal of this refactoring effort..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="priority">Priority Level</label>
+                    <select id="priority">
+                        <option value="high">High Priority</option>
+                        <option value="medium" selected>Medium Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="section">
+                <h2>📊 Progress Overview</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalTasks">0</div>
+                        <div class="stat-label">Total Tasks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedTasks">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="progressPercent">0%</div>
+                        <div class="stat-label">Progress</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+                </div>
+            </div>
+
+            <!-- Refactoring Tasks Section -->
+            <div class="section">
+                <h2>✅ Refactoring Tasks</h2>
+                <div class="task-list" id="taskList">
+                    <!-- Tasks will be added here dynamically -->
+                </div>
+                <div class="add-task-form">
+                    <input type="text" id="newTaskInput" placeholder="Add a new refactoring task...">
+                    <button class="btn" onclick="addTask()">Add Task</button>
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div class="section">
+                <h2>📝 Technical Notes & Considerations</h2>
+                <div class="input-group">
+                    <textarea id="technicalNotes" placeholder="Add any technical details, dependencies, risks, or important notes..."></textarea>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="export-section">
+                <button class="btn" onclick="exportPlan()">📥 Export Plan as JSON</button>
+                <button class="btn btn-secondary" onclick="clearAll()" style="margin-left: 10px;">🗑️ Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load saved data on page load
+        window.addEventListener('DOMContentLoaded', loadData);
+
+        function addTask() {
+            const input = document.getElementById('newTaskInput');
+            const taskText = input.value.trim();
+            
+            if (taskText === '') {
+                alert('Please enter a task description');
+                return;
+            }
+
+            const taskList = document.getElementById('taskList');
+            const taskId = 'task-' + Date.now();
+            
+            const taskItem = document.createElement('div');
+            taskItem.className = 'task-item';
+            taskItem.id = taskId;
+            taskItem.innerHTML = `
+                <input type="checkbox" onchange="toggleTask('${taskId}')">
+                <span class="task-text">${taskText}</span>
+                <button class="delete-btn" onclick="deleteTask('${taskId}')">Delete</button>
+            `;
+            
+            taskList.appendChild(taskItem);
+            input.value = '';
+            
+            saveData();
+            updateProgress();
+        }
+
+        function toggleTask(taskId) {
+            const task = document.getElementById(taskId);
+            task.classList.toggle('completed');
+            saveData();
+            updateProgress();
+        }
+
+        function deleteTask(taskId) {
+            const task = document.getElementById(taskId);
+            task.remove();
+            saveData();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const tasks = document.querySelectorAll('.task-item');
+            const completedTasks = document.querySelectorAll('.task-item.completed');
+            
+            const total = tasks.length;
+            const completed = completedTasks.length;
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('progressPercent').textContent = percent + '%';
+            
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percent + '%';
+            progressFill.textContent = percent + '%';
+        }
+
+        function saveData() {
+            const data = {
+                projectName: document.getElementById('projectName').value,
+                projectGoal: document.getElementById('projectGoal').value,
+                priority: document.getElementById('priority').value,
+                technicalNotes: document.getElementById('technicalNotes').value,
+                tasks: []
+            };
+            
+            const tasks = document.querySelectorAll('.task-item');
+            tasks.forEach(task => {
+                data.tasks.push({
+                    id: task.id,
+                    text: task.querySelector('.task-text').textContent,
+                    completed: task.classList.contains('completed')
+                });
+            });
+            
+            localStorage.setItem('refactoringPlan', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('refactoringPlan');
+            if (!savedData) return;
+            
+            const data = JSON.parse(savedData);
+            
+            document.getElementById('projectName').value = data.projectName || '';
+            document.getElementById('projectGoal').value = data.projectGoal || '';
+            document.getElementById('priority').value = data.priority || 'medium';
+            document.getElementById('technicalNotes').value = data.technicalNotes || '';
+            
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            
+            data.tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item' + (task.completed ? ' completed' : '');
+                taskItem.id = task.id;
+                taskItem.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask('${task.id}')">
+                    <span class="task-text">${task.text}</span>
+                    <button class="delete-btn" onclick="deleteTask('${task.id}')">Delete</button>
+                `;
+                taskList.appendChild(taskItem);
+            });
+            
+            updateProgress();
+        }
+
+        function exportPlan() {
+            const data = {
+                projectName: document.getElementById('projectName').value,
+                projectGoal: document.getElementById('projectGoal').value,
+                priority: document.getElementById('priority').value,
+                technicalNotes: document.getElementById('technicalNotes').value,
+                tasks: [],
+                exportDate: new Date().toISOString()
+            };
+            
+            const tasks = document.querySelectorAll('.task-item');
+            tasks.forEach(task => {
+                data.tasks.push({
+                    text: task.querySelector('.task-text').textContent,
+                    completed: task.classList.contains('completed')
+                });
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'refactoring-plan-' + Date.now() + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.removeItem('refactoringPlan');
+                document.getElementById('projectName').value = '';
+                document.getElementById('projectGoal').value = '';
+                document.getElementById('priority').value = 'medium';
+                document.getElementById('technicalNotes').value = '';
+                document.getElementById('taskList').innerHTML = '';
+                updateProgress();
+            }
+        }
+
+        // Auto-save on input changes
+        document.getElementById('projectName').addEventListener('input', saveData);
+        document.getElementById('projectGoal').addEventListener('input', saveData);
+        document.getElementById('priority').addEventListener('change', saveData);
+        document.getElementById('technicalNotes').addEventListener('input', saveData);
+
+        // Allow Enter key to add tasks
+        document.getElementById('newTaskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+</body>
+</html>
